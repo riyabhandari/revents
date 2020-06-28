@@ -8,10 +8,10 @@ const eventsFromDashboard = [
   {
     id: '1',
     title: 'Trip to Tower of London',
-    date: '2018-03-27T11:00:00+00:00',
+    date: '2018-03-27',
     category: 'culture',
     description:
-    "London's many attractions have turned it into one of the world's most visited destinations, with some 28 million visitors a year. Whether visitors are seeking culture, shopping, palaces or a great night out, London has it all. London's easy to use public transport systems are another key to its popularity.",
+    "London's many attractions have turned it into one of the world's most visited destinations, with some 28 million visitors a year. Whether visitors are seeking culture, shopping, palaces or a great night out, London has it all.",
     city: 'London, UK',
     venue: "Tower of London, St Katharine's & Wapping, London",
     hostedBy: 'Bob',
@@ -32,10 +32,10 @@ const eventsFromDashboard = [
   {
     id: '2',
     title: 'Trip to Punch and Judy Pub',
-    date: '2018-03-28T14:00:00+00:00',
+    date: '2018-03-28',
     category: 'drinks',
     description:
-    "London's many attractions have turned it into one of the world's most visited destinations, with some 28 million visitors a year. Whether visitors are seeking culture, shopping, palaces or a great night out, London has it all. London's easy to use public transport systems are another key to its popularity.",
+    "London's many attractions have turned it into one of the world's most visited destinations, with some 28 million visitors a year. Whether visitors are seeking culture, shopping, palaces or a great night out, London has it all.",
     city: 'London, UK',
     venue: 'Punch & Judy, Henrietta Street, London, UK',
     hostedBy: 'Tom',
@@ -58,12 +58,24 @@ const eventsFromDashboard = [
 class EventDashboard extends Component {
     state={
         events:eventsFromDashboard,
-        isOpen:false
+        isOpen:false,
+        isSelected:null
     }
-    handleIsOpenToggle=()=>{
-        this.setState(({isOpen})=>({
-            isOpen:!isOpen
-        }))
+    //handleIsOpenToggle=()=>{
+      //  this.setState(({isOpen})=>({
+        //    isOpen:!isOpen
+        //}))
+    //}
+    handleCreateFormOpen=()=>{
+        this.setState({
+            isOpen:true,
+            selectedEvent:null
+        })
+    }
+    handleFormCancel=()=>{
+        this.setState({
+            isOpen:false
+        })
     }
     handleCreateEvent=(newEvent)=>{
         newEvent.id=cuid()
@@ -73,16 +85,41 @@ class EventDashboard extends Component {
             isOpen:false
         }))
     }
+    handleSelectEvent=(event)=>{
+        this.setState({
+            selectedEvent:event,
+            isOpen:true
+        })
+    }
+    handleUpdateEvent=(updatedEvent)=>{
+        this.setState(({events})=>({
+            events:events.map(event=>{
+                if(event.id===updatedEvent.id){
+                    return {...updatedEvent}
+                }
+                else{
+                    return event
+                }
+            }),
+            isOpen:false,
+            selectedEvent:null
+        }))
+    }
+    handleDeleteEvent=(id)=>{
+        this.setState(({events})=>({
+            events:events.filter(e=>e.id!==id)
+        }))
+    }
     render() {
-        const {events,isOpen}=this.state
+        const {events,isOpen,selectedEvent}=this.state
         return (
             <Grid>
                 <Grid.Column width={10}>
-                    <EventList events={events}/>
+                    <EventList events={events} selectEvent={this.handleSelectEvent} deleteEvent={this.handleDeleteEvent}/>
                 </Grid.Column>
                 <Grid.Column width={6}>
-                    <Button onClick={this.handleIsOpenToggle} positive content="Create Event"></Button>
-                    {isOpen && <EventForm createEvent={this.handleCreateEvent} cancelFormOpen={this.handleIsOpenToggle}/>}
+                    <Button onClick={this.handleCreateFormOpen} positive content="Create Event"></Button>
+                    {isOpen && <EventForm key={selectedEvent?selectedEvent.id:0} updateEvent={this.handleUpdateEvent} selectedEvent={selectedEvent} createEvent={this.handleCreateEvent} cancelFormOpen={this.handleFormCancel}/>}
                 </Grid.Column>
             </Grid>
         )
