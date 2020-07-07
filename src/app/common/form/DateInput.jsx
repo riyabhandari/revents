@@ -10,7 +10,7 @@ const DateInput = ({
     return (
         <Form.Field error={touched && !!error}>
         <input {...input} placeholder={placeholder} type='date'></input>
-            {touched && error && <Label basic color='red'>{error}</Label>}
+        {touched && error && <Label basic color='red'>{error}</Label>}
         </Form.Field>
     )
 }
